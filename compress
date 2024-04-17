@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Check if ffmpeg is installed
+if ! command -v ffmpeg &> /dev/null; then
+    echo "ffmpeg is not installed. Please install ffmpeg and try again."
+    exit 1
+fi
+
+# Check if input file argument is provided
+if [ "$#" -lt 1 ]; then
+    echo "Usage: $0 input_video [crf_value]"
+    exit 1
+fi
+
+input_file="$1"
+
+# Check if CRF value is provided, otherwise prompt the user
+if [ -z "$2" ]; then
+    read -p "Enter CRF value (default is 23): " crf_value
+    crf_value=${crf_value:-23}  # Default CRF value is 23 if user doesn't enter anything
+else
+    crf_value="$2"
+fi
+
+# Generate output file name by appending "_compressed" to the input file name
+output_file="${input_file%.*}_compressed.mp4"
+
+# Compress video using ffmpeg
+ffmpeg -i "$input_file" -c:v libx264 -crf "$crf_value" "$output_file"
+
+echo "Video compression complete. Output file: $output_file"
+
